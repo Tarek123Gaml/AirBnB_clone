@@ -6,8 +6,6 @@
 """
 import uuid
 from datetime import datetime
-from models import storage
-
 
 class BaseModel():
     """
@@ -16,7 +14,7 @@ class BaseModel():
         - Defines all common attributes/methods for other classes
     """
 
-    def __init__(self, *args, **kwargs):
+    def __init__(self):
         """
             - BaseModel object instantiation
             - Creates an instance of type 'BaseModel' with params
@@ -24,28 +22,15 @@ class BaseModel():
                 - created_at - time instance was created
                 - updated_at - time when a change occurs in the instance
         """
-        if kwargs:
-            for key, value in kwargs.items():
-                if key == 'created_at' or key == 'updated_at':
-                    setattr(self, key,
-                            datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%f'))
-                elif key != '__class__':
-                    setattr(self, key, value)
-        else:
-            self.id = str(uuid.uuid4())
-            iso_time = datetime.now()
-            self.created_at = self.updated_at = iso_time
-            # updated_at - modified anytime we make a change in the object
-            storage.new(self)
+        self.id = str(uuid.uuid4())
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
 
     def __str__(self):
         """
             Prints class name id & dict in human readable format
         """
-        return "[{}] ({}) {}".format(
-                self.__class__.__name__,
-                self.id, self.__dict__
-                )
+        return f"[{type(self).__name__}] ({self.id}) {self.__dict__}"
 
     def save(self):
         """
@@ -53,7 +38,6 @@ class BaseModel():
             - Updates updated_at with the current datetime.
         """
         self.updated_at = datetime.now()
-        storage.save()
 
     def to_dict(self):
         """
@@ -61,9 +45,8 @@ class BaseModel():
             - returns a dictionary containing all keys & values of __dict__
             - includes a new '__class__' key with class name
         """
-        result_dict = dict(self.__dict__)
-        result_dict['__class__'] = self.__class__.__name__
-        result_dict['created_at'] = datetime.isoformat(self.created_at)
-        result_dict['updated_at'] = datetime.isoformat(self.updated_at)
-        return (result_dict)
-    
+        obj_dict = self.__dict__.copy()
+        obj_dict['__class__'] = type(self).__name__
+        obj_dict['created_at'] = self.created_at.isoformat()
+        obj_dict['updated_at'] = self.updated_at.isoformat()
+        return obj_dict
