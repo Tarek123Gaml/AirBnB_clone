@@ -5,7 +5,7 @@
 """
 import cmd
 
-hh
+
 class HBNBCommand(cmd.Cmd):
     """
     HBNBCommand
