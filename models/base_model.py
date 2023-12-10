@@ -1,72 +1,75 @@
 #!/usr/bin/python3
 """
-    base_model.py
-    - Module
-    - Contains parent class BaseModel
+Module for the BaseModel class.
 """
 import uuid
 from datetime import datetime
-from models.__init__ import storage
+import models
 
 
-class BaseModel():
-    """
-        BaseModel
-        - Class object & base class
-        - Defines all common attributes/methods for other classes
-    """
-
+class BaseModel:
     def __init__(self, *args, **kwargs):
-        """
-            - BaseModel object instantiation
-            - Creates an instance of type 'BaseModel' with params
-                - id - unique user id
-                - created_at - time instance was created
-                - updated_at - time when a change occurs in the instance
-        """
+        time_format = "%Y-%m-%dT%H:%M:%S.%f"
         self.id = str(uuid.uuid4())
-        self.created_at = datetime.now()
-        self.updated_at = datetime.now()
-
+        self.created_at = datetime.utcnow()
+        self.updated_at = datetime.utcnow()
+        
         if kwargs:
             for key, value in kwargs.items():
-                if key == '__class__':
-                    continue  # Skip '__class__'
-                elif key in ('created_at', 'updated_at'):
-                    # Convert string representation to datetime object
-                    setattr(
-                        self,
-                        key,
-                        datetime.strptime(value, '%Y-%m-%dT%H:%M:%S.%f')
-                    )
-
+                if key == "__class__":
+                    continue
+                elif key == "created_at" or key == "updated_at":
+                    setattr(self, key, datetime.strptime(value, time_format))
                 else:
                     setattr(self, key, value)
 
-        storage.new(self)
-
-    def __str__(self):
-        """
-            Prints class name id & dict in human readable format
-        """
-        return f"[{type(self).__name__}] ({self.id}) {self.__dict__}"
+        models.storage.new(self)
 
     def save(self):
         """
-            Public method
-            - Updates updated_at with the current datetime.
+
         """
-        self.updated_at = datetime.now()
-        storage.new(self)
+        self.updated_at = datetime.utcnow()
+        models.storage.save()
 
     def to_dict(self):
         """
-            Public method
-            - returns a dictionary containing all keys & values of __dict__
-            - includes a new '__class__' key with class name
+
         """
-        obj_dict = self.__dict__.copy()
-        obj_dict['__class__'] = type(self).__name__
-        obj_dict['created_at'] = self.created_at.isoformat()
-        obj_dict['updated_at'] = self.updated_at.isoformat()
-        return obj_dict
+        inst_dict = self.__dict__.copy()
+        inst_dict["__class__"] = self.__class__.__name__
+        inst_dict["created_at"] = self.created_at.isoformat()
+        inst_dict["updated_at"] = self.updated_at.isoformat()
+
+        return inst_dict
+
+    def __str__(self):
+        """
+
+        """
+        class_name = self.__class__.__name__
+        return "[{}] ({}) {}".format(class_name, self.id, self.__dict__)
+
+
+if __name__ == "__main__":
+    my_model = BaseModel()
+    my_model.name = "My_First_Model"
+    my_model.my_number = 89
+    print(my_model.id)
+    print(my_model)
+    print(type(my_model.created_at))
+    print("--")
+    my_model_json = my_model.to_dict()
+    print(my_model_json)
+    print("JSON of my_model:")
+    for key in my_model_json.keys():
+        print("\t{}: ({}) - {}".format(key, type(my_model_json[key]), my_model_json[key]))
+
+    print("--")
+    my_new_model = BaseModel(**my_model_json)
+    print(my_new_model.id)
+    print(my_new_model)
+    print(type(my_new_model.created_at))
+
+    print("--")
+    print(my_model is my_new_model)

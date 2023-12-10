@@ -3,7 +3,15 @@
     Module to serialize and deserialize data
 """
 import json
+import os
+from models.base_model import BaseModel
 from models.user import User
+from models.amenity import Amenity
+from models.place import Place
+from models.review import Review
+from models.state import State
+from models.city import City
+
 
 class FileStorage:
     __file_path = "file.json"
@@ -19,7 +27,7 @@ class FileStorage:
         self.__objects[key] = obj
 
     def save(self):
-        """Serializes __objects to the JSON file (__file_path)"""
+        """Serializes __objects to the JSON file"""
         serialized_objs = {key: obj.to_dict() for key, obj in self.__objects.items()}
         with open(self.__file_path, 'w') as file:
             json.dump(serialized_objs, file)

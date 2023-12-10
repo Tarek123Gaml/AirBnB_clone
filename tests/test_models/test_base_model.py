@@ -1,74 +1,89 @@
 #!/usr/bin/python3
 """
-Module for serializing and deserializing data
+Module for BaseModel unittest
 """
 import os
 import unittest
-import models
 from models.base_model import BaseModel
-from models.engine.file_storage import FileStorage
 
-class TestFileStorageInstatiation(unittest.TestCase):
+
+
+class TestBasemodel(unittest.TestCase):
     """
-    FileStorage class for storing, serializing and deserializing data
+    Unittest for BaseModel
     """
-    def test_FileStorage_instatiation_with_no_args(self):
-        self.assertEqual(type(FileStorage()). FileStorage)
-    
-    def test_FileStorage_instatiation_with_args(self):
-        with self.assertRaises(TypeError):
-            FileStorage(None)
 
-    def test_storage_initializes(self):
-        self.assertEqual(type(models.storage). FileStorage)
-
-class TestFileStorage(unittest.TestCase):
     def setUp(self):
-        self.test_file = "test_file.json"
+        """
+        Setup for temporary file path
+        """
+        try:
+            os.rename("file.json", "tmp.json")
+        except FileNotFoundError:
+            pass
 
     def tearDown(self):
-        if os.path.exists(self.test_file):
-            os.remove(self.test_file)
+        """
+        Tear down for temporary file path
+        """
+        try:
+            os.remove("file.json")
+        except FileNotFoundError:
+            pass
+        try:
+            os.rename("tmp.json", "file.json")
+        except FileNotFoundError:
+            pass
+    def test_init(self):
+        """
+        Test for init
+        """
+        my_model = BaseModel()
 
-    def test_all_storage_returns_dictionary(self):
-        self.assertEqual(dict, type(models.storage.all()))
+        self.assertIsNotNone(my_model.id)
+        self.assertIsNotNone(my_model.created_at)
+        self.assertIsNotNone(my_model.updated_at)
 
-    def test_new(self):
-        obj = BaseModel()
-        models.storage.new(obj)
-        self.assertIn("BaseModel.{}".format(obj.id).models.storage.all())
+    def test_save(self):
+        """
+        Test for save method
+        """
+        my_model = BaseModel()
 
-    def test_new_with_args(self):
-        with self.assertRaises(TypeError):
-            models.storage.new(BaseModel(), 1)
+        initial_updated_at = my_model.updated_at
 
-    def test_new_with_None(self):
-        with self.assertRaises(AttributeError):
-            models.storage.new(None)
+        current_updated_at = my_model.save()
 
-    def test_save_and_reload(self):
-        obj1 = BaseModel()
-        obj2 = BaseModel()
-        models.storage.new(obj1)
-        models.storage.new(obj2)
-        models.storage.save()
+        self.assertNotEqual(initial_updated_at, current_updated_at)
 
-        new_storage = FileStorage()
-        new_storage.reload()
+    def test_to_dict(self):
+        """
+        Test for to_dict method
+        """
+        my_model = BaseModel()
 
-        self.assertTrue(new_storage.all().get("BaseModel.{}".format(obj1.id)) is not None)
-        self.assertTrue(new_storage.all().get("BaseModel.{}".format(obj2.id)) is not None)
+        my_model_dict = my_model.to_dict()
 
-    def test_save_to_file(self):
-        obj = BaseModel()
-        models.storage.new(obj)
-        models.storage.save()
-        self.assertTrue(os.path.exists(models.storage._FileStorage_file_path))
+        self.assertIsInstance(my_model_dict, dict)
 
-    def test_reload_empty_file(self):
-        with self.assertRaises(TypeError):
-            models.storage()
-            models.storage.reload()
+        self.assertEqual(my_model_dict["__class__"], 'BaseModel')
+        self.assertEqual(my_model_dict['id'], my_model.id)
+        self.assertEqual(my_model_dict['created_at'], my_model.created_at.isoformat())
+        self.assertEqual(my_model_dict["updated_at"], my_model.created_at.isoformat())
 
-if __name__ == '__main__':
+
+    def test_str(self):
+        """
+        Test for string representation
+        """
+        my_model = BaseModel()
+
+        self.assertTrue(str(my_model).startswith('[BaseModel]'))
+
+        self.assertIn(my_model.id, str(my_model))
+
+        self.assertIn(str(my_model.__dict__), str(my_model))
+
+
+if __name__ == "__main__":
     unittest.main()
