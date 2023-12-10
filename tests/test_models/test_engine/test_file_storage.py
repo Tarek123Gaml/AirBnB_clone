@@ -8,19 +8,21 @@ import models
 from models.base_model import BaseModel
 from models.engine.file_storage import FileStorage
 
+
 class TestFileStorageInstatiation(unittest.TestCase):
     """
     FileStorage class for storing, serializing and deserializing data
     """
     def test_FileStorage_instatiation_with_no_args(self):
         self.assertEqual(type(FileStorage()). FileStorage)
-    
+
     def test_FileStorage_instatiation_with_args(self):
         with self.assertRaises(TypeError):
             FileStorage(None)
 
     def test_storage_initializes(self):
         self.assertEqual(type(models.storage). FileStorage)
+
 
 class TestFileStorage(unittest.TestCase):
     def setUp(self):
@@ -56,8 +58,10 @@ class TestFileStorage(unittest.TestCase):
         new_storage = FileStorage()
         new_storage.reload()
 
-        self.assertTrue(new_storage.all().get("BaseModel.{}".format(obj1.id)) is not None)
-        self.assertTrue(new_storage.all().get("BaseModel.{}".format(obj2.id)) is not None)
+        self.assertTrue(new_storage.all().get(\)
+                        ("BaseModel.{}".format(obj1.id)) is not None)
+        self.assertTrue(new_storage.all().get(\)
+                        ("BaseModel.{}".format(obj2.id)) is not None)
 
     def test_save_to_file(self):
         obj = BaseModel()
@@ -69,6 +73,7 @@ class TestFileStorage(unittest.TestCase):
         with self.assertRaises(TypeError):
             models.storage()
             models.storage.reload()
+
 
 if __name__ == '__main__':
     unittest.main()

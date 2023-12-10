@@ -3,12 +3,14 @@
     console.py
     - Program entry point for the command interpreter
 """
+import json
 import cmd
 import re
 import ast
 import shlex
 from models.base_model import BaseModel
 from models import storage
+
 
 class HBNBCommand(cmd.Cmd):
     """
@@ -116,7 +118,7 @@ class HBNBCommand(cmd.Cmd):
                 if key.split('.')[0] == commands[0]:
                     print(str(value))
 
-    def do_update_(self, arg):
+    def do_update(self, arg: str):
         """
         Update an instance by adding or updating an attribute.
         Usage: update <class_name> <id> <attribute_name> "<attribute_value>"
@@ -177,6 +179,7 @@ class HBNBCommand(cmd.Cmd):
                     setattr(obj, attr_name, attr_value)
 
                     obj.save()
+
 
 if __name__ == '__main__':
     HBNBCommand().cmdloop()
