@@ -24,11 +24,15 @@ class BaseModel():
                 - created_at - time instance was created
                 - updated_at - time when a change occurs in the instance
         """
+        self.id = str(uuid.uuid4())
+        self.created_at = datetime.now()
+        self.updated_at = datetime.now()
+
         if kwargs:
             for key, value in kwargs.items():
                 if key == '__class__':
                     continue  # Skip '__class__'
-                if key in ('created_at', 'updated_at'):
+                elif key in ('created_at', 'updated_at'):
                     # Convert string representation to datetime object
                     setattr(
                         self,
@@ -38,11 +42,8 @@ class BaseModel():
 
                 else:
                     setattr(self, key, value)
-        else:
-            self.id = str(uuid.uuid4())
-            self.created_at = datetime.now()
-            self.updated_at = datetime.now()
-            storage.new(self)
+
+        storage.new(self)
 
     def __str__(self):
         """

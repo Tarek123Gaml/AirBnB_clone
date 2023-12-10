@@ -1,6 +1,9 @@
 #!/usr/bin/python3
+"""
+    Module to serialize and deserialize data
+"""
 import json
-
+from models.user import User
 
 class FileStorage:
     __file_path = "file.json"
@@ -28,8 +31,7 @@ class FileStorage:
                 data = json.load(file)
                 for key, value in data.items():
                     class_name, obj_id = key.split('.')
-                    # Here, you'll need to create instances
-                    # from the data and store them in __objects
+                    # Here, you'll need to create instances from the data and store them in __objects
                     # Create instances and update __objects
         except FileNotFoundError:
             pass

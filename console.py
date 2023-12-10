@@ -10,6 +10,7 @@ import ast
 import shlex
 from models.base_model import BaseModel
 from models import storage
+from models.user import User
 
 
 class HBNBCommand(cmd.Cmd):
@@ -18,7 +19,7 @@ class HBNBCommand(cmd.Cmd):
     - Class implementing the command interpreter
     """
     prompt = "(hbnb) "
-    valid_classes = ["BaseModel"]
+    valid_classes = ["BaseModel", User]
 
     def emptyline(self):
         """
